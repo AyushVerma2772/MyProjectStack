@@ -23,7 +23,7 @@ const Navbar = ({ user }) => {
             <nav className="navbar navbar-light .bg-transparent">
                 <div className="container-fluid">
 
-                    <Link className="navbar-brand fw-semibold fs-3" to='/' >My Project Stack</Link>
+                    <Link className="navbar-brand fw-semibold fs-3" to='/'>My Project Stack</Link>
 
                     <div className='d-flex align-items-center'>
                         {user && <span className='fw-semibold mx-4 fs-4'>{user.displayName}</span>}
