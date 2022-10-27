@@ -28,8 +28,11 @@ const Table = ({ user }) => {
 
     //! Delete Doc
     const deleteProject = async (id) => {
-        const docRef = doc(db, collName, id)
-        await deleteDoc(docRef, id);
+        if (window.confirm("Do you want delete the project")) {
+            const docRef = doc(db, collName, id)
+            await deleteDoc(docRef, id);
+        }
+        
     }
 
 
