@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import Home from './components/Home';
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from './firebase-config';
+import Footer from './components/Footer';
 
 const App = () => {
 
@@ -30,9 +31,9 @@ const App = () => {
           <Route path='/' element={currentUser ? <Home user={currentUser} /> : <Login />} />
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<Signup />} />
-          <Route path='*' element={<Home />} />
         </Routes>
 
+        <Footer />
       </BrowserRouter>
     </>
   )

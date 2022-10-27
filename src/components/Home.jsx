@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Table from './Table';
-import { collection, addDoc } from 'firebase/firestore'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase-config';
 import Alert from './Alert';
 
@@ -14,6 +14,8 @@ const Home = ({ user }) => {
     const [repoLink, setRepoLink] = useState('');
     const [alert, setAlert] = useState();
     const [alertType, setAlertType] = useState("danger");
+    const regx = /^(https:\/\/|http:\/\/|www\.)/;
+
 
     const handelSubmit = async (e) => {
 
@@ -26,24 +28,40 @@ const Home = ({ user }) => {
                 setAlert(null)
             }, 2500);
             return
+        }
 
+        if (!regx.test(repoLink)) {
+            setAlertType("danger")
+            setAlert(`Invalid Repo Link`);
+            setTimeout(() => {
+                setAlert(null)
+            }, 2500);
+            return
+        }
+
+        if ( projectLink && !regx.test(projectLink)) {
+            setAlertType("danger")
+            setAlert(`Invalid Project Link`);
+            setTimeout(() => {
+                setAlert(null)
+            }, 2500);
+            return
         }
 
         await addDoc(collRef, {
             projectName,
             projectLink,
-            repoLink
+            repoLink,
+            time: serverTimestamp()
         });
-
+        setProjectName("");
+        setProjectLink("");
+        setRepoLink("");
         setAlert("Project added");
         setAlertType("success");
         setTimeout(() => {
             setAlert(null)
         }, 2000);
-
-        setProjectName("");
-        setProjectLink("");
-        setRepoLink("");
     }
 
 
@@ -75,7 +93,7 @@ const Home = ({ user }) => {
 
                                 <div className="row">
                                     <div className="col my-2">
-                                        <button className='btn btn-primary align-middle my-btn'>Add<i className="bi bi-plus-lg"></i></button>
+                                        <button className='btn btn-primary align-middle my-btn px-4'>Add<i className="bi bi-plus-lg"></i></button>
                                     </div>
                                 </div>
 
@@ -88,7 +106,7 @@ const Home = ({ user }) => {
                 </div>
 
                 {/* Project Table */}
-                <div className="container my-3 p-0 rounded">
+                <div className="container my-3 p-0 rounded d-flex flex-column align-items-center table-responsive">
                     <Table user={user} />
                 </div>
 

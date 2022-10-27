@@ -7,13 +7,18 @@ const Table = ({ user }) => {
 
     const collName = `users/${user.uid}/projects`;
     const collRef = collection(db, collName);
-    const [projects, setProjects] = useState([])
+    const [projects, setProjects] = useState([]);
+    const [search, setSearch] = useState("");
 
     //! Realtime Read of todos
     useEffect(() => {
         const unsub = onSnapshot(collRef, snapshot => {
-            setProjects(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })))
+            setProjects(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })).sort((p1, p2) => {
+                const propertyName = 'time';
+                return p1[propertyName] < p2[propertyName] ? 1 : p1[propertyName] > p2[propertyName] ? -1 : 0
+            }))
         });
+
 
         return () => {
             unsub();
@@ -26,12 +31,14 @@ const Table = ({ user }) => {
         const docRef = doc(db, collName, id)
         await deleteDoc(docRef, id);
     }
-    
+
 
 
     return (
         <>
-            <table className="table table-striped table-dark m-0" style={{ borderRadius: '5px' }} >
+            <input type="text" className="form-control" placeholder="Search Project" value={search} onChange={e => setSearch(e.target.value)} />
+
+            <table className="table table-striped table-dark mt-2" style={{ borderRadius: '5px' }} >
                 <thead>
                     <tr>
                         <th scope="col" width='9%'>S No.</th>
@@ -44,11 +51,11 @@ const Table = ({ user }) => {
                 <tbody>
 
                     {
-                        projects.map((ele, i) => (
+                        projects.filter((e) => e.projectName.toLowerCase().includes(search.toLowerCase())).map((ele, i) => (
                             <tr key={i} >
                                 <th scope="row" width='9%'>{i + 1}</th>
                                 <td className='text-center' width='75%'>
-                                    <a className='nav-link' target={"_blank"} rel="noreferrer" href={ele.projectLink} title={ele.projectLink}>{ele.projectName}</a>
+                                    <a className='nav-link my-link' target={"_blank"} rel="noreferrer" href={ele.projectLink} title={ele.projectLink}>{ele.projectName}</a>
                                 </td>
 
                                 <td className='text-center' width='8%'>
@@ -56,7 +63,7 @@ const Table = ({ user }) => {
                                 </td>
 
                                 <th className='text-center' width='8%'>
-                                        <i role="button" className="bi bi-trash-fill text-danger" onClick={e => deleteProject(ele.id)} ></i>
+                                    <i role="button" className="bi bi-trash-fill text-danger" onClick={e => deleteProject(ele.id)} ></i>
                                 </th>
                             </tr>
                         ))
